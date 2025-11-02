@@ -10,7 +10,8 @@ using Reimbursement_API.Models;
 using System.IdentityModel.Tokens.Jwt;        // JwtSecurityToken, JwtSecurityTokenHandler
 using System.Security.Claims;                // Claim, ClaimTypes
 using System.Text;                           // Encoding
-using Microsoft.IdentityModel.Tokens;        // SymmetricSecurityKey, SigningCredentials, SecurityAlgorithms
+using Microsoft.IdentityModel.Tokens;
+using Reimbursement_API.Services;        // SymmetricSecurityKey, SigningCredentials, SecurityAlgorithms
 
 
 namespace Reimbursement_API.Controllers
@@ -21,87 +22,40 @@ namespace Reimbursement_API.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _config;
+        private readonly AuthService _authService;
 
-        public AuthController(AppDbContext context, IConfiguration config)
+        public AuthController(AppDbContext context, IConfiguration config, AuthService authService)
         {
             _context = context;
             _config = config;
+            _authService = authService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+        public async Task<IActionResult> Register(RegisterDto dto)
         {
-            if (await _context.Users.AnyAsync(c => c.Email == dto.Email))
+            try
             {
-                return BadRequest("Email already Registered");
+                var result = _authService.RegisterAsync(dto);
+                return Ok(new { message = result });
+            } catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
-
-            var user = new User
-            {
-                FullName = dto.FullName,
-                Email = dto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Role = "Employee",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Register Successful" });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user == null)
+            try
             {
-                return Unauthorized("Invalid credentials");
+                var response = await _authService.LoginAsync(dto);
+                return Ok(response);
             }
-
-            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            catch (Exception ex)
             {
-                return Unauthorized("Invalid Credentials");
+                return Unauthorized(new { error = ex.Message });
             }
-
-            var token = GenerateJwtToken(user);
-
-
-            return Ok(new AuthResponseDto
-            {
-                Token = token,
-                Role = user.Role,
-                FullName = user.FullName,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpiresMinutes"]))
-            });
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var jwtSection = _config.GetSection("Jwt");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            // Semacam Payload : 
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.FullName ?? ""),
-                new Claim(ClaimTypes.Role, user.Role ?? "Employee") // role penting untuk authorize
-            };
-
-            // Bikin Object Token : 
-            var token = new JwtSecurityToken(
-                issuer: jwtSection["Issuer"],
-                audience: jwtSection["Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(double.Parse(jwtSection["ExpiresMinutes"])),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

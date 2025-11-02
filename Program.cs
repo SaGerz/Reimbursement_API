@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Reimbursement_API.Data;
 using Reimbursement_API.Models;
+using Reimbursement_API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     )
 );
+
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 
