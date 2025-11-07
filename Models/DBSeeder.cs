@@ -10,12 +10,48 @@ namespace Reimbursement_API.Models
     {
         public static void Seed(AppDbContext context)
         {
-            if(!context.Users.Any())
+            bool isChanged = false;
+
+            // === USERS SEED ===
+            if (!context.Users.Any(u => u.Email == "manager@company.com"))
             {
-                context.Users.AddRange(
-                new User { FullName = "Manager Default", Email = "manager@company.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("manager123"), Role = "Manager" },
-                new User { FullName = "Finance Default", Email = "finance@company.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("finance123"), Role = "Finance" }                );
+                context.Users.Add(new User
+                {
+                    FullName = "Manager Default",
+                    Email = "manager@company.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("manager123"),
+                    Role = "Manager"
+                });
+                isChanged = true;
             }
+
+            if (!context.Users.Any(u => u.Email == "finance@company.com"))
+            {
+                context.Users.Add(new User
+                {
+                    FullName = "Finance Default",
+                    Email = "finance@company.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("finance123"),
+                    Role = "Finance"
+                });
+                isChanged = true;
+            }
+
+            // === CATEGORIES SEED ===
+            if (!context.Categories.Any())
+            {
+                context.Categories.AddRange(
+                    new Category { CategoryName = "Transport", Description = "Biaya perjalanan dan transportasi" },
+                    new Category { CategoryName = "Meal", Description = "Makan siang, konsumsi meeting, dll" },
+                    new Category { CategoryName = "Office Supplies", Description = "Alat tulis, printer, dan perlengkapan kantor" },
+                    new Category { CategoryName = "Travel", Description = "Perjalanan dinas dan penginapan" }
+                );
+                isChanged = true;
+            }
+
+            // 🧾 SIMPAN KE DB KALAU ADA YANG BARU
+            if (isChanged)
+                context.SaveChanges();
         }
     }
 }
