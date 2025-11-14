@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reimbursement_API.DTOs;
 using Reimbursement_API.Services;
+using Reimbursement_API.Interface;
 
 namespace Reimbursement_API.Controllers
 {
@@ -14,11 +15,11 @@ namespace Reimbursement_API.Controllers
     [Route("api/[controller]")]
     public class ReimburstmentController : ControllerBase
     {
-        private readonly ReimbursmentService _reimbursementService;
+        private IReimbursementService _reimbursementServices;
 
-        public ReimburstmentController(ReimbursmentService reimbursementService)
+        public ReimburstmentController(IReimbursementService reimbursementServices)
         {
-            _reimbursementService = reimbursementService;
+            _reimbursementServices = reimbursementServices;
         }
 
         [Authorize(Roles = "Employee")]
@@ -29,7 +30,7 @@ namespace Reimbursement_API.Controllers
             {
                 var Email = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                var result = await _reimbursementService.CreateReimburstmentAsync(Email, dto);
+                var result = await _reimbursementServices.CreateReimburstmentAsync(Email, dto);
                 return Ok(new
                 {
                     message = "Reimbursement created successfully",

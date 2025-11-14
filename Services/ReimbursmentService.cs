@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Reimbursement_API.Data;
 using Reimbursement_API.DTOs;
 using Reimbursement_API.Models;
+using Reimbursement_API.Interface;
 
 namespace Reimbursement_API.Services
 {
-    public class ReimbursmentService
+    public class ReimbursmentService : IReimbursementService
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;

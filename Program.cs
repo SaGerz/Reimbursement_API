@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Reimbursement_API.Data;
+using Reimbursement_API.Interface;
 using Reimbursement_API.Models;
 using Reimbursement_API.Services;
 
@@ -67,7 +68,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<ReimbursmentService>();
+// builder.Services.AddScoped<ReimbursmentService>();
+builder.Services.AddScoped<IReimbursementService, ReimbursmentService>();
 
 var app = builder.Build();
 
