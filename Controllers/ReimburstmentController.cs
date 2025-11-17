@@ -42,5 +42,30 @@ namespace Reimbursement_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [Authorize(Roles = "Employee")]
+        [HttpGet]
+        public async Task<IActionResult> GetMyReimburstments()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return BadRequest(new { message = "User ID claim not found" });
+                }
+                
+                var userId = int.Parse(userIdClaim.Value);
+
+                var result = await _reimbursementServices.GetMyReimburstmentAsync(userId);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                
+                return BadRequest(new {message = ex.Message});
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using Reimbursement_API.Data;
 using Reimbursement_API.DTOs;
 using Reimbursement_API.Models;
 using Reimbursement_API.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Reimbursement_API.Services
 {
@@ -67,5 +68,26 @@ namespace Reimbursement_API.Services
 
             return reimbursement;
         }
+
+        public async Task<List<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId)
+        {
+            var results = await _context.Reimburstments
+                .Where(r => r.EmployeeId == userId)
+                .Include(r => r.Category)
+                .OrderByDescending(r => r.CreateAt)
+                .Select(r => new ReimburstmentListDto
+                {
+                    ReimbursementId = r.ReimbursementId,
+                    Description = r.Description,
+                    Amount = r.Amount,
+                    CategoryName = r.Category.CategoryName,
+                    ExpeseDate = r.ExpenseDate,
+                    Status = r.Status,
+                    ReceiptAttachment = r.ReceiptAttachment, 
+                    CreateAt = r.CreateAt
+                }).ToListAsync();
+        
+            return results;        
+        }   
     }
 }
