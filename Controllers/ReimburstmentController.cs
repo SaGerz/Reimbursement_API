@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Reimbursement_API.DTOs;
 using Reimbursement_API.Services;
 using Reimbursement_API.Interface;
+using Reimbursement_API.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Reimbursement_API.Controllers
 {
@@ -66,6 +68,22 @@ namespace Reimbursement_API.Controllers
                 
                 return BadRequest(new {message = ex.Message});
             }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDetail(int id)
+        {
+            int currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var result = await _reimbursementServices.GetDetailAsync(id, currentUserId);
+
+            if(result == null)
+                return NotFound(new {message = "Reimbursment Not Found!"});
+
+            if(result.ReimbursementId == -1)
+                return Unauthorized(new {message = "You do not have access to this reimburstment"});
+
+            return Ok(result);
         }
     }
 }
