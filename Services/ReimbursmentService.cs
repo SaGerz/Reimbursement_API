@@ -88,6 +88,39 @@ namespace Reimbursement_API.Services
                 }).ToListAsync();
         
             return results;        
-        }   
+        }
+
+        public async Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId)
+        {
+            var data = await _context.Reimburstments
+                .Include(r => r.Category)
+                .FirstOrDefaultAsync(r => r.ReimbursementId == id);
+
+            if(data == null)
+                return null;
+
+            if(data.EmployeeId != currentUserId)
+            {
+                return new ReimburstmentDetailDto
+                {
+                    ReimbursementId = -1
+                };
+            }
+
+            return new ReimburstmentDetailDto
+            {
+                ReimbursementId = data.ReimbursementId,
+                Description = data.Description,
+                Amount = data.Amount,
+                CategoryName = data.Category.CategoryName,
+                ExpenseDate = data.ExpenseDate,
+                Status = data.Status,
+                ReceiptAttachment = data.ReceiptAttachment,
+                CreateAt = data.CreateAt,
+                // ApproverName = data.Approver?.FullName,
+                // ApprovedAt = data.ApprovedAt,
+                // RejectReason = data.RejectReason
+            };
+        }
     }
 }
