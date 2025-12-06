@@ -99,5 +99,17 @@ namespace Reimbursement_API.Controllers
             var result = await _reimbursementServices.GetPendingReimburstmentAsync();
             return Ok(result);
         }
+
+        [Authorize(Roles = "Manager")]
+        [HttpGet("manager/{id}")]
+        public async Task<IActionResult> GetDetailReimburstmentManagerAsync(int id)
+        {
+            var result = await _reimbursementServices.GetDetailReimburstmentManagerAsync(id);
+
+            if(result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
     }
 }
