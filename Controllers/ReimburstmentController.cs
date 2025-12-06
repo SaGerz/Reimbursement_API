@@ -85,5 +85,19 @@ namespace Reimbursement_API.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("pending")]
+        public async Task<IActionResult> GetPending()
+        {
+            var userRole = User.FindFirst(ClaimTypes.Role).Value;
+
+            if(userRole != "Manager")
+            {
+                return Forbid();
+            }
+
+            var result = await _reimbursementServices.GetPendingReimburstmentAsync();
+            return Ok(result);
+        }
     }
 }
