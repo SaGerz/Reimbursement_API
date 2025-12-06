@@ -122,5 +122,24 @@ namespace Reimbursement_API.Services
                 // RejectReason = data.RejectReason
             };
         }
+
+        public async Task<List<PendingReimburstmentDto>> GetPendingReimburstmentAsync()
+        {
+            var data = await _context.Reimburstments
+                .Include(r => r.Employee)
+                .Include(r => r.Category)
+                .Where(r => r.Status == "Pending")  
+                .OrderByDescending(r => r.CreateAt)
+                .ToListAsync();
+
+            return data.Select(r => new PendingReimburstmentDto
+            {
+                ReimburstmentId = r.ReimbursementId,
+                EmployeeName = r.Employee.FullName,
+                CategoryName = r.Category.CategoryName,
+                ReimburstmentStatus = r.Status,
+                CreateAt = r.CreateAt
+            }).ToList();
+        }
     }
 }

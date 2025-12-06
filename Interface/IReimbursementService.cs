@@ -13,5 +13,7 @@ namespace Reimbursement_API.Interface
         Task<Reimburstment> CreateReimburstmentAsync(string Email, CreateReimburstmentDto dto);
         Task<List<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId);
         Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId);
+
+        Task<List<PendingReimburstmentDto>> GetPendingReimburstmentAsync();
     }
 }
