@@ -15,5 +15,6 @@ namespace Reimbursement_API.Interface
         Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId);
 
         Task<List<PendingReimburstmentDto>> GetPendingReimburstmentAsync();
+        Task<ReimburstmentManagerDetailDto> GetDetailReimburstmentManagerAsync(int id);
     }
 }

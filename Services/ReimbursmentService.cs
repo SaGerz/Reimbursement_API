@@ -141,5 +141,26 @@ namespace Reimbursement_API.Services
                 CreateAt = r.CreateAt
             }).ToList();
         }
+
+        public async Task<ReimburstmentManagerDetailDto> GetDetailReimburstmentManagerAsync(int id)
+        {
+            var data = await _context.Reimburstments
+                .Include(r => r.Employee)
+                .Include(r => r.Category)
+                .FirstOrDefaultAsync(r => r.ReimbursementId == id);
+
+            return new ReimburstmentManagerDetailDto
+            {
+                ReimbursementId = data.ReimbursementId,
+                EmployeName = data.Employee.FullName,
+                CategoryName = data.Category.CategoryName,
+                Description = data.Description,
+                ReceiptAttachment = data.ReceiptAttachment,
+                ReimburstmentStatus = data.Status,
+                Amount = data.Amount,
+                CreateAt = data.CreateAt,
+                ExpenseDate = data.ExpenseDate
+            };
+        }
     }
 }
