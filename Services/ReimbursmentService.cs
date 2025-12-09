@@ -162,5 +162,32 @@ namespace Reimbursement_API.Services
                 ExpenseDate = data.ExpenseDate
             };
         }
+
+        public async Task<bool> UpdateReimburstmentStatusAsync(int userId, int id, UpdateStatusReimburstmentDto dto)
+        {
+            var reimbursement = await _context.Reimburstments.FirstOrDefaultAsync(r => r.ReimbursementId == id);
+
+            if(reimbursement == null)
+            {
+                return false;
+            }
+
+            // validasi status Approve or Reject
+            if(dto.NewStatus != "Approved" && dto.NewStatus != "Rejected")
+            {
+                throw new ArgumentException("Status must be 'Approve' Or 'Reject'");
+            }
+
+            if(dto.NewStatus == "Approved")
+            {
+                reimbursement.ApprovedBy = userId;
+                reimbursement.ApprovedAt = DateTime.Now;
+            }
+
+            reimbursement.Status = dto.NewStatus;
+            reimbursement.RejectedReason = dto.ManagerNotes;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

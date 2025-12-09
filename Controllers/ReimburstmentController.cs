@@ -111,5 +111,55 @@ namespace Reimbursement_API.Controllers
 
             return Ok(result);
         }
+
+        [Authorize(Roles = "Manager")]
+        [HttpPost("manager/{id}/approve")]
+        public async Task<IActionResult> ApproveReimburstmentAsync(int id, UpdateStatusReimburstmentDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            
+            if (userIdClaim == null)
+            {
+                return BadRequest(new { message = "User ID claim not found" });
+            }
+                
+            var userId = int.Parse(userIdClaim.Value);
+
+            var result = await _reimbursementServices.UpdateReimburstmentStatusAsync(userId, id, dto);
+            if(!result)
+            {
+                return NotFound();
+            }
+
+            return Ok(new {message = $"Reimburstment {id} approved"});
+        }
+
+        [Authorize(Roles = "Manager")]
+        [HttpPost("manager/{id}/reject")]
+        public async Task<IActionResult> RejectReimburstmentAsycn(int id, UpdateStatusReimburstmentDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            
+            if (userIdClaim == null)
+            {
+                return BadRequest(new { message = "User ID claim not found" });
+            }
+                
+            var userId = int.Parse(userIdClaim.Value);
+
+            if (string.IsNullOrEmpty(dto.ManagerNotes))
+            {
+                return BadRequest(new { message = "Notes are required for rejection." });
+            }
+        
+            var result = await _reimbursementServices.UpdateReimburstmentStatusAsync(userId, id, dto);
+
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return Ok(new { message = $"Reimbursement {id} rejected." });
+        }
     }
 }
