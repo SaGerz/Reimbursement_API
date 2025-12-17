@@ -20,6 +20,6 @@ namespace Reimbursement_API.DTOs
         // Detail Data buat nanti : 
         // public string ApproverName { get; set; }
         // public DateTime? ApprovedAt { get; set; }
-        // public string RejectReason { get; set; }
+        public string RejectReason { get; set; }
     }
 }
