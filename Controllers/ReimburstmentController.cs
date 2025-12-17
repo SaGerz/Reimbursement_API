@@ -30,9 +30,11 @@ namespace Reimbursement_API.Controllers
         {
             try
             {
-                var Email = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                
+                var userId = int.Parse(userIdClaim.Value);
 
-                var result = await _reimbursementServices.CreateReimburstmentAsync(Email, dto);
+                var result = await _reimbursementServices.CreateReimburstmentAsync(userId, dto);
                 return Ok(new
                 {
                     message = "Reimbursement created successfully",

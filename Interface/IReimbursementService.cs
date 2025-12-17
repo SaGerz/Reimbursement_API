@@ -10,7 +10,7 @@ namespace Reimbursement_API.Interface
 {
     public interface IReimbursementService
     {
-        Task<Reimburstment> CreateReimburstmentAsync(string Email, CreateReimburstmentDto dto);
+        Task<Reimburstment> CreateReimburstmentAsync(int id, CreateReimburstmentDto dto);
         Task<List<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId);
         Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId);
 

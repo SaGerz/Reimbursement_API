@@ -21,9 +21,9 @@ namespace Reimbursement_API.Services
             _environment = environment;
         }
 
-        public async Task<Reimburstment> CreateReimburstmentAsync(string Email, CreateReimburstmentDto dto)
+        public async Task<Reimburstment> CreateReimburstmentAsync(int id, CreateReimburstmentDto dto)
         {
-            var employee = _context.Users.FirstOrDefault(u => u.Email == Email);
+            var employee = _context.Users.FirstOrDefault(u => u.UserId == id);
             Console.WriteLine($"Employee Id : {employee.UserId}");
 
             string? receiptPath = null;
@@ -119,7 +119,7 @@ namespace Reimbursement_API.Services
                 CreateAt = data.CreateAt,
                 // ApproverName = data.Approver?.FullName,
                 // ApprovedAt = data.ApprovedAt,
-                // RejectReason = data.RejectReason
+                RejectReason = data.RejectedReason
             };
         }
 
