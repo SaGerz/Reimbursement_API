@@ -13,7 +13,7 @@ namespace Reimbursement_API.Models
         public int HistoryId { get; set; }
 
         [Required]
-        public int ReimburstmentId { get; set; }
+        public int ReimbursementId { get; set; }
         [ForeignKey("ReimbursementId")]
         public Reimburstment Reimburstment { get; set; }
 
