@@ -163,7 +163,25 @@ namespace Reimbursement_API.Services
             };
         }
 
-        public async Task<bool> UpdateReimburstmentStatusAsync(int userId, int id, UpdateStatusReimburstmentDto dto)
+        public async Task<bool> ApproveAsync(int userId, int id, string? ManagerApproveNotes)
+        {
+            var reimbursement = await _context.Reimburstments.FirstOrDefaultAsync(r => r.ReimbursementId == id);
+
+            if(reimbursement == null)
+            {
+                return false;
+            }   
+
+            reimbursement.Status = "Approved";
+            reimbursement.ApprovedBy = userId;
+            reimbursement.ApprovedAt = DateTime.Now;
+
+            await AddHistory(id, userId, "Approved", ManagerApproveNotes);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        
+        public async Task<bool> RejectAsync(int userId, int id, string ManagerRejectedNotes)
         {
             var reimbursement = await _context.Reimburstments.FirstOrDefaultAsync(r => r.ReimbursementId == id);
 
@@ -172,22 +190,27 @@ namespace Reimbursement_API.Services
                 return false;
             }
 
-            // validasi status Approve or Reject
-            if(dto.NewStatus != "Approved" && dto.NewStatus != "Rejected")
-            {
-                throw new ArgumentException("Status must be 'Approve' Or 'Reject'");
-            }
-
-            if(dto.NewStatus == "Approved")
-            {
-                reimbursement.ApprovedBy = userId;
-                reimbursement.ApprovedAt = DateTime.Now;
-            }
-
-            reimbursement.Status = dto.NewStatus;
-            reimbursement.RejectedReason = dto.ManagerNotes;
+            reimbursement.Status = "Rejected";
+            reimbursement.RejectedReason = ManagerRejectedNotes;
+            
+            await AddHistory(id, userId, "Rejected", ManagerRejectedNotes);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        // Helper : 
+        public async Task AddHistory(int reimburstmentId, int userId, string actionType, string remarks)
+        {
+            var approvalHistory = new ApprovalHistory
+            {
+                ReimbursementId = reimburstmentId,
+                ActionBy = userId,
+                ActionDate = DateTime.Now,
+                ActionType = actionType, 
+                Remarks = remarks
+            };
+
+            await _context.ApprovalHistories.AddAsync(approvalHistory);
         }
     }
 }

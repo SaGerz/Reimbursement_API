@@ -116,7 +116,7 @@ namespace Reimbursement_API.Controllers
 
         [Authorize(Roles = "Manager")]
         [HttpPost("manager/{id}/approve")]
-        public async Task<IActionResult> ApproveReimburstmentAsync(int id, UpdateStatusReimburstmentDto dto)
+        public async Task<IActionResult> ApproveReimburstmentAsync(int id, ApproveDto dto)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             
@@ -127,7 +127,7 @@ namespace Reimbursement_API.Controllers
                 
             var userId = int.Parse(userIdClaim.Value);
 
-            var result = await _reimbursementServices.UpdateReimburstmentStatusAsync(userId, id, dto);
+            var result = await _reimbursementServices.ApproveAsync(userId, id, dto.ManagerApproveNotes);
             if(!result)
             {
                 return NotFound();
@@ -138,7 +138,7 @@ namespace Reimbursement_API.Controllers
 
         [Authorize(Roles = "Manager")]
         [HttpPost("manager/{id}/reject")]
-        public async Task<IActionResult> RejectReimburstmentAsycn(int id, UpdateStatusReimburstmentDto dto)
+        public async Task<IActionResult> RejectReimburstmentAsycn(int id, RejectedDto dto)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             
@@ -149,12 +149,12 @@ namespace Reimbursement_API.Controllers
                 
             var userId = int.Parse(userIdClaim.Value);
 
-            if (string.IsNullOrEmpty(dto.ManagerNotes))
+            if (string.IsNullOrEmpty(dto.ManagerRejectedNotes))
             {
                 return BadRequest(new { message = "Notes are required for rejection." });
             }
         
-            var result = await _reimbursementServices.UpdateReimburstmentStatusAsync(userId, id, dto);
+            var result = await _reimbursementServices.RejectAsync(userId, id, dto.ManagerRejectedNotes);
 
             if (!result)
             {
