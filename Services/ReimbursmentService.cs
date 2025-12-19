@@ -212,5 +212,27 @@ namespace Reimbursement_API.Services
 
             await _context.ApprovalHistories.AddAsync(approvalHistory);
         }
+
+        public async Task<List<ApprovalHistoryDto>> GetApprovalHistoryAsync()
+        {
+            var historyData = await _context.ApprovalHistories
+                                .Include(h => h.User)
+                                .OrderByDescending(h => h.ActionDate)
+                                .ToListAsync();
+
+            if(historyData == null)
+            {
+                return null;
+            }
+
+            return historyData.Select(h => new ApprovalHistoryDto
+            {
+                ReimburstmentID = h.ReimbursementId,
+                ActionBy = h.User.FullName,
+                ActionType = h.ActionType,
+                ActionDate = h.ActionDate,
+                Remarks = h.Remarks
+            }).ToList();
+        }
     }
 }

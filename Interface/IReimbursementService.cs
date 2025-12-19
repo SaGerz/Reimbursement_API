@@ -18,5 +18,6 @@ namespace Reimbursement_API.Interface
         Task<ReimburstmentManagerDetailDto> GetDetailReimburstmentManagerAsync(int id);
         Task<bool> ApproveAsync(int userId, int id, string? ManagerApproveNotes);
         Task<bool> RejectAsync(int userId, int id, string ManagerRejectedNotes);
+        Task<List<ApprovalHistoryDto>> GetApprovalHistoryAsync();
     }
 }

@@ -163,5 +163,13 @@ namespace Reimbursement_API.Controllers
 
             return Ok(new { message = $"Reimbursement {id} rejected." });
         }
+
+        [Authorize(Roles = "Manager")]
+        [HttpGet("manager/approval-histories")]
+        public async Task<IActionResult> GetApprovalHistory()
+        {
+            var result = await _reimbursementServices.GetApprovalHistoryAsync();
+            return Ok(result);
+        }
     }
 }
