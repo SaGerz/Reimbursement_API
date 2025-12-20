@@ -217,6 +217,7 @@ namespace Reimbursement_API.Services
         {
             var historyData = await _context.ApprovalHistories
                                 .Include(h => h.User)
+                                .Include(h => h.Reimburstment).ThenInclude(r => r.Employee)
                                 .OrderByDescending(h => h.ActionDate)
                                 .ToListAsync();
 
@@ -228,6 +229,7 @@ namespace Reimbursement_API.Services
             return historyData.Select(h => new ApprovalHistoryDto
             {
                 ReimburstmentID = h.ReimbursementId,
+                CreatedBy = h.Reimburstment.Employee.FullName,
                 ActionBy = h.User.FullName,
                 ActionType = h.ActionType,
                 ActionDate = h.ActionDate,
