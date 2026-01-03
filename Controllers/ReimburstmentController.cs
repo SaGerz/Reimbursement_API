@@ -171,5 +171,13 @@ namespace Reimbursement_API.Controllers
             var result = await _reimbursementServices.GetApprovalHistoryAsync();
             return Ok(result);
         }
+
+        [Authorize(Roles = "Finance")]
+        [HttpGet("finance/payment-queue")]
+        public async Task<IActionResult> GetPaymentQueueAsync()
+        {
+            var result = await _reimbursementServices.GetPaymentQueueAsync();
+            return Ok(result);
+        }
     }
 }
