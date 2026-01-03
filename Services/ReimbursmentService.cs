@@ -236,5 +236,24 @@ namespace Reimbursement_API.Services
                 Remarks = h.Remarks
             }).ToList();
         }
+
+        public async Task<List<FinancePaymentQueueDto>> GetPaymentQueueAsync()
+        {
+            var data = await _context.Reimburstments
+                .Where(r => r.Status == "Approved" && r.PaidBy == null)
+                .Include(r => r.Employee)
+                .Include(r => r.Employee)
+                .OrderBy(r => r.ApprovedAt)
+                .Select(r => new FinancePaymentQueueDto
+                {
+                    ReimbursementId = r.ReimbursementId,
+                    CategoryName = r.Category.CategoryName,
+                    EmployeeName = r.Employee.FullName,
+                    Amount = r.Amount,
+                    ApproveAt = r.ApprovedAt
+                }).ToListAsync();
+
+            return data;
+        }
     }
 }
