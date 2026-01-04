@@ -179,5 +179,22 @@ namespace Reimbursement_API.Controllers
             var result = await _reimbursementServices.GetPaymentQueueAsync();
             return Ok(result);
         }
+
+        [Authorize(Roles = "Finance")]
+        [HttpPost("finance/reimburstment/{id}/payment-proof")]
+        public async Task<IActionResult> UploadPaymentProof(int id, [FromForm] UploadPaymentProofDto dto)
+        {
+            var financeIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            
+            if (financeIdClaim == null)
+            {
+                return BadRequest(new { message = "User ID claim not found" });
+            }
+
+            var financeId = int.Parse(financeIdClaim.Value);
+
+            var result = await _reimbursementServices.UploadPaymentProofAsync(financeId, id, dto);
+            return Ok(new { message = "Bukti pembayaran berhasil di upload!" });
+        }
     }
 }
