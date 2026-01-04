@@ -255,5 +255,53 @@ namespace Reimbursement_API.Services
 
             return data;
         }
+
+        public async Task<bool> UploadPaymentProofAsync(int financeUserId, int reimbursementId, UploadPaymentProofDto dto)
+        {
+            var reimbursement = await _context.Reimburstments.FirstOrDefaultAsync(r => r.ReimbursementId == reimbursementId);
+
+            if(reimbursement == null)
+            {
+                throw new Exception("Reimburstment tidak ditemukan!");
+            }    
+
+            if(reimbursement.Status != "Approved")
+            {
+                throw new Exception("Reimburstment Belum disetujui Manager!");
+            }
+
+            string? paymentPath = null;
+
+            if(dto.PaymentAttachment != null)
+            {
+                var uploadFolder = Path.Combine(
+                    _environment.WebRootPath ?? "wwwroot", "uploads", "payments"
+                );
+
+                if(!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PaymentAttachment.FileName)}";
+                var fullPath = Path.Combine(uploadFolder, fileName);
+
+                using(var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await dto.PaymentAttachment.CopyToAsync(stream);
+                }
+
+                paymentPath = Path.Combine("uploads", "payments", fileName);
+            }
+
+            reimbursement.PaymentAttachment = paymentPath;
+            reimbursement.PaidBy = financeUserId;
+            reimbursement.PaidDate = DateTime.UtcNow;
+            reimbursement.Status = "Paid";
+            reimbursement.UpdateAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

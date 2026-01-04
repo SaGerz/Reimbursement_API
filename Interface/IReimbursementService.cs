@@ -24,5 +24,6 @@ namespace Reimbursement_API.Interface
 
         // Finance
         Task<List<FinancePaymentQueueDto>> GetPaymentQueueAsync();
+        Task<bool> UploadPaymentProofAsync(int financeUserId, int reimburstmentId, UploadPaymentProofDto dto);
     }
 }
