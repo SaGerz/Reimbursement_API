@@ -196,5 +196,13 @@ namespace Reimbursement_API.Controllers
             var result = await _reimbursementServices.UploadPaymentProofAsync(financeId, id, dto);
             return Ok(new { message = "Bukti pembayaran berhasil di upload!" });
         }
+
+        [Authorize(Roles = "Finance")]
+        [HttpGet("finance/dashboard")]
+        public async Task<IActionResult> GetFinanceDashboard()
+        {
+            var result = await _reimbursementServices.GetFinanceDashboardAsync();
+            return Ok(result);
+        }
     }
 }

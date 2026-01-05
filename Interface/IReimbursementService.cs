@@ -23,6 +23,7 @@ namespace Reimbursement_API.Interface
         Task<List<ApprovalHistoryDto>> GetApprovalHistoryAsync();
 
         // Finance
+        Task<FinanceDashboardDto> GetFinanceDashboardAsync();
         Task<List<FinancePaymentQueueDto>> GetPaymentQueueAsync();
         Task<bool> UploadPaymentProofAsync(int financeUserId, int reimburstmentId, UploadPaymentProofDto dto);
     }

@@ -303,5 +303,29 @@ namespace Reimbursement_API.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<FinanceDashboardDto> GetFinanceDashboardAsync()
+        {
+            var now = DateTime.UtcNow;
+            var currentMonth = now.Month;
+            var currentYear = now.Year;
+
+            var paidReimburstment = _context.Reimburstments
+                .Where(
+                    r => r.Status == "Paid" &&
+                    r.PaidDate.HasValue &&
+                    r.PaidDate.Value.Month == currentMonth &&
+                    r.PaidDate.Value.Year == currentYear
+                );
+
+            var totalPaid = await paidReimburstment.SumAsync(r => r.Amount);
+            var totalCount = await paidReimburstment.CountAsync();
+
+            return new FinanceDashboardDto
+            {
+                TotalPaidThisMonth = totalPaid,
+                TotalPaidCountThisMonth = totalCount
+            };
+        }
     }
 }
