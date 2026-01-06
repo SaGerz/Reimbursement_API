@@ -327,5 +327,34 @@ namespace Reimbursement_API.Services
                 TotalPaidCountThisMonth = totalCount
             };
         }
+
+        public async Task<List<FinanceReportEmployeeDto>> GetReportByEmployeeAsync(int month, int year)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1);
+
+            var report = await _context.Reimburstments
+                .Where(r => 
+                    r.Status == "Paid" &&
+                    r.PaidDate >= startDate &&
+                    r.PaidDate < endDate
+                )
+                .GroupBy(r => new
+                {
+                    r.EmployeeId,
+                    r.Employee.FullName
+                })
+                .Select(g => new FinanceReportEmployeeDto
+                {
+                    EmployeeId = g.Key.EmployeeId,
+                    EmployeeName = g.Key.FullName,
+                    TotalAmount = g.Sum(x => x.Amount),
+                    TotalRequest = g.Count()
+                })
+                .OrderByDescending(r => r.TotalAmount)
+                .ToListAsync();
+
+            return report;
+        }
     }
 }
