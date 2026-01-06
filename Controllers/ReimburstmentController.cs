@@ -204,5 +204,13 @@ namespace Reimbursement_API.Controllers
             var result = await _reimbursementServices.GetFinanceDashboardAsync();
             return Ok(result);
         }
+
+        [Authorize(Roles = "Finance")]
+        [HttpGet("finance/reports/employee")]
+        public async Task<IActionResult> GetReportByEmployee([FromQuery] int month, [FromQuery] int year)
+        {
+            var data = await _reimbursementServices.GetReportByEmployeeAsync(month, year);
+            return Ok(data);
+        }
     }
 }
