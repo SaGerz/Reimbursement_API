@@ -94,6 +94,7 @@ namespace Reimbursement_API.Services
         {
             var data = await _context.Reimburstments
                 .Include(r => r.Category)
+                .Include(r => r.PaidByUser)
                 .FirstOrDefaultAsync(r => r.ReimbursementId == id);
 
             if(data == null)
@@ -117,6 +118,10 @@ namespace Reimbursement_API.Services
                 Status = data.Status,
                 ReceiptAttachment = data.ReceiptAttachment,
                 CreateAt = data.CreateAt,
+                PaidBy = data.PaidBy,
+                PaidByName = data.PaidByUser?.FullName,
+                PaidDate = data.PaidDate,
+                PaymentAttachment = data.PaymentAttachment,
                 // ApproverName = data.Approver?.FullName,
                 // ApprovedAt = data.ApprovedAt,
                 RejectReason = data.RejectedReason
