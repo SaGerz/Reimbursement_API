@@ -38,6 +38,9 @@ namespace Reimbursement_API.Models
         public string? RejectedReason { get; set; }
 
         public int? PaidBy { get; set; }
+        
+        [ForeignKey("PaidBy")]
+        public User? PaidByUser {get; set;}
         public DateTime? PaidDate { get; set; }
         public string? PaymentAttachment { get; set; }
 

@@ -15,7 +15,10 @@ namespace Reimbursement_API.DTOs
         public string Status {get; set;}
         public string ReceiptAttachment {get; set;}
         public DateTime CreateAt {get; set;}
-
+        public int? PaidBy {get; set;} 
+        public string? PaidByName {get; set;}
+        public DateTime? PaidDate {get; set;}
+        public string? PaymentAttachment {get; set;}
 
         // Detail Data buat nanti : 
         // public string ApproverName { get; set; }
