@@ -12,5 +12,6 @@ namespace Reimbursement_API.DTOs
         public decimal Amount {get; set;}
         public string CategoryName {get; set;}
         public DateTime ApproveAt {get; set;}
+        public string? ReceiptAttachment {get; set;}
     }
 }
