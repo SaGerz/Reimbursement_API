@@ -255,7 +255,8 @@ namespace Reimbursement_API.Services
                     CategoryName = r.Category.CategoryName,
                     EmployeeName = r.Employee.FullName,
                     Amount = r.Amount,
-                    ApproveAt = r.ApprovedAt
+                    ApproveAt = r.ApprovedAt,
+                    ReceiptAttachment = r.ReceiptAttachment
                 }).ToListAsync();
 
             return data;
