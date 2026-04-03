@@ -143,7 +143,10 @@ namespace Reimbursement_API.Services
                 EmployeeName = r.Employee.FullName,
                 CategoryName = r.Category.CategoryName,
                 ReimburstmentStatus = r.Status,
-                CreateAt = r.CreateAt
+                CreateAt = r.CreateAt,
+                ReceiptAttachment = r.ReceiptAttachment,
+                Amount = r.Amount,
+                Description = r.Description
             }).ToList();
         }
 
