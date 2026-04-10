@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Reimbursement_API.Models;
 using Reimbursement_API.Controllers;
 using Reimbursement_API.DTOs;
+using Reimbursement_API.Helpers;
 
 namespace Reimbursement_API.Interface
 {
@@ -20,7 +21,7 @@ namespace Reimbursement_API.Interface
         Task<ReimburstmentManagerDetailDto> GetDetailReimburstmentManagerAsync(int id);
         Task<bool> ApproveAsync(int userId, int id, string? ManagerApproveNotes);
         Task<bool> RejectAsync(int userId, int id, string ManagerRejectedNotes);
-        Task<List<ApprovalHistoryDto>> GetApprovalHistoryAsync();
+        Task<PaginationResponse<ApprovalHistoryDto>> GetApprovalHistoryAsync(int page, int pageSize);
 
         // Finance
         Task<FinanceDashboardDto> GetFinanceDashboardAsync();
