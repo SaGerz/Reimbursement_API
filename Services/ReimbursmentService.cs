@@ -7,6 +7,7 @@ using Reimbursement_API.DTOs;
 using Reimbursement_API.Models;
 using Reimbursement_API.Interface;
 using Microsoft.EntityFrameworkCore;
+using Reimbursement_API.Helpers;
 
 namespace Reimbursement_API.Services
 {
@@ -221,20 +222,21 @@ namespace Reimbursement_API.Services
             await _context.ApprovalHistories.AddAsync(approvalHistory);
         }
 
-        public async Task<List<ApprovalHistoryDto>> GetApprovalHistoryAsync()
+        public async Task<PaginationResponse<ApprovalHistoryDto>> GetApprovalHistoryAsync(int page, int pageSize)
         {
-            var historyData = await _context.ApprovalHistories
+            var query = _context.ApprovalHistories
                                 .Include(h => h.User)
                                 .Include(h => h.Reimburstment).ThenInclude(r => r.Employee)
-                                .OrderByDescending(h => h.ActionDate)
-                                .ToListAsync();
+                                .OrderByDescending(h => h.ActionDate);
 
-            if(historyData == null)
-            {
-                return null;
-            }
+            var totalCount = await query.CountAsync();
 
-            return historyData.Select(h => new ApprovalHistoryDto
+            var data = await query
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToListAsync();
+
+            var result = data.Select(h => new ApprovalHistoryDto
             {
                 ReimburstmentID = h.ReimbursementId,
                 CreatedBy = h.Reimburstment.Employee.FullName,
@@ -243,6 +245,15 @@ namespace Reimbursement_API.Services
                 ActionDate = h.ActionDate,
                 Remarks = h.Remarks
             }).ToList();
+
+            return new PaginationResponse<ApprovalHistoryDto>
+            {
+                Data = result,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
         }
 
         public async Task<List<FinancePaymentQueueDto>> GetPaymentQueueAsync()

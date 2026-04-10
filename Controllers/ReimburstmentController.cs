@@ -166,9 +166,9 @@ namespace Reimbursement_API.Controllers
 
         [Authorize(Roles = "Manager")]
         [HttpGet("manager/approval-histories")]
-        public async Task<IActionResult> GetApprovalHistory()
+        public async Task<IActionResult> GetApprovalHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _reimbursementServices.GetApprovalHistoryAsync();
+            var result = await _reimbursementServices.GetApprovalHistoryAsync(page, pageSize);
             return Ok(result);
         }
 
