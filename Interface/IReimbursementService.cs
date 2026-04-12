@@ -13,7 +13,7 @@ namespace Reimbursement_API.Interface
     {
         // Karyawan
         Task<Reimburstment> CreateReimburstmentAsync(int id, CreateReimburstmentDto dto);
-        Task<List<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId);
+        Task<PaginationResponse<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId, int page, int pageSize);
         Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId);
 
         // Manager

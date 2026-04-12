@@ -70,13 +70,21 @@ namespace Reimbursement_API.Services
             return reimbursement;
         }
 
-        public async Task<List<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId)
+        public async Task<PaginationResponse<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId, int page, int pageSize)
         {
-            var results = await _context.Reimburstments
+            var query = _context.Reimburstments
                 .Where(r => r.EmployeeId == userId)
                 .Include(r => r.Category)
-                .OrderByDescending(r => r.CreateAt)
-                .Select(r => new ReimburstmentListDto
+                .OrderByDescending(r => r.CreateAt);
+                
+            var totalCount = await query.CountAsync();
+
+            var data = await query
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToListAsync();
+            
+            var result = data.Select(r => new ReimburstmentListDto
                 {
                     ReimbursementId = r.ReimbursementId,
                     Description = r.Description,
@@ -86,9 +94,16 @@ namespace Reimbursement_API.Services
                     Status = r.Status,
                     ReceiptAttachment = r.ReceiptAttachment, 
                     CreateAt = r.CreateAt
-                }).ToListAsync();
+                }).ToList();
         
-            return results;        
+            return new PaginationResponse<ReimburstmentListDto>
+            {
+                Data = result,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling((double) totalCount / pageSize)
+            };        
         }
 
         public async Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId)

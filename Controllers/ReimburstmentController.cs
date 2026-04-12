@@ -49,7 +49,7 @@ namespace Reimbursement_API.Controllers
 
         [Authorize(Roles = "Employee")]
         [HttpGet]
-        public async Task<IActionResult> GetMyReimburstments()
+        public async Task<IActionResult> GetMyReimburstments([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace Reimbursement_API.Controllers
                 
                 var userId = int.Parse(userIdClaim.Value);
 
-                var result = await _reimbursementServices.GetMyReimburstmentAsync(userId);
+                var result = await _reimbursementServices.GetMyReimburstmentAsync(userId, page, pageSize);
 
                 return Ok(result);
             }
