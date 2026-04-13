@@ -25,7 +25,7 @@ namespace Reimbursement_API.Interface
 
         // Finance
         Task<FinanceDashboardDto> GetFinanceDashboardAsync();
-        Task<List<FinancePaymentQueueDto>> GetPaymentQueueAsync();
+        Task<PaginationResponse<FinancePaymentQueueDto>> GetPaymentQueueAsync(int page, int pageSize);
         Task<bool> UploadPaymentProofAsync(int financeUserId, int reimburstmentId, UploadPaymentProofDto dto);
         Task<List<FinanceReportEmployeeDto>> GetReportByEmployeeAsync(int month, int year);
     }
