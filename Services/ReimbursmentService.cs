@@ -271,25 +271,40 @@ namespace Reimbursement_API.Services
             };
         }
 
-        public async Task<List<FinancePaymentQueueDto>> GetPaymentQueueAsync()
+        public async Task<PaginationResponse<FinancePaymentQueueDto>> GetPaymentQueueAsync(int page, int pageSize)
         {
-            var data = await _context.Reimburstments
+            var query = _context.Reimburstments
                 .Where(r => r.Status == "Approved" && r.PaidBy == null)
                 .Include(r => r.Employee)
-                .Include(r => r.Employee)
-                .OrderBy(r => r.ApprovedAt)
-                .Select(r => new FinancePaymentQueueDto
-                {
-                    ReimbursementId = r.ReimbursementId,
-                    CategoryName = r.Category.CategoryName,
-                    EmployeeName = r.Employee.FullName,
-                    Amount = r.Amount,
-                    ApproveAt = r.ApprovedAt,
-                    ReceiptAttachment = r.ReceiptAttachment,
-                    DescriptionReimburstment = r.Description
-                }).ToListAsync();
+                .Include(r => r.Category)
+                .OrderByDescending(r => r.ApprovedAt);
 
-            return data;
+            var totalCount = await query.CountAsync();
+
+            var data = await query
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToListAsync();
+
+            var result = data.Select(r => new FinancePaymentQueueDto
+            {
+                ReimbursementId = r.ReimbursementId,
+                CategoryName = r.Category.CategoryName,
+                EmployeeName = r.Employee.FullName,
+                Amount = r.Amount,
+                ApproveAt = r.ApprovedAt,
+                ReceiptAttachment = r.ReceiptAttachment,
+                DescriptionReimburstment = r.Description
+            }).ToList();
+
+            return new PaginationResponse<FinancePaymentQueueDto>
+            {
+                Data = result,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
         }
 
         public async Task<bool> UploadPaymentProofAsync(int financeUserId, int reimbursementId, UploadPaymentProofDto dto)

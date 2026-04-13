@@ -174,9 +174,9 @@ namespace Reimbursement_API.Controllers
 
         [Authorize(Roles = "Finance")]
         [HttpGet("finance/payment-queue")]
-        public async Task<IActionResult> GetPaymentQueueAsync()
+        public async Task<IActionResult> GetPaymentQueueAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _reimbursementServices.GetPaymentQueueAsync();
+            var result = await _reimbursementServices.GetPaymentQueueAsync(page, pageSize);
             return Ok(result);
         }
 
