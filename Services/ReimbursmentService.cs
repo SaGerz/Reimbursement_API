@@ -119,7 +119,7 @@ namespace Reimbursement_API.Services
                 totalApprove = data.Count(x => x.Status == "Approved"),
                 totalRejected = data.Count(x => x.Status == "Rejected"),
                 totalPending = data.Count(x => x.Status == "Pending"),
-                totalPaid = data.Count(x => x.Status == "Paid")
+                totalPaid = data.Where(x => x.Status == "Paid").Sum(x => x.Amount)
             };
         }
 
