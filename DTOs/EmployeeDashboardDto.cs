@@ -12,6 +12,6 @@ namespace Reimbursement_API.DTOs
         public int totalApprove {get; set;}
         public int totalRejected {get; set;}
         public int totalPending {get; set;}
-        public int totalPaid {get; set;}
+        public decimal totalPaid {get; set;}
     }
 }
