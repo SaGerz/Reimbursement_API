@@ -106,6 +106,23 @@ namespace Reimbursement_API.Services
             };        
         }
 
+        public async Task<EmployeeDashboardDto> GetEmployeeDashboardAsync(int userId)
+        {
+            var data = await _context.Reimburstments
+                .Where(r => r.EmployeeId == userId)
+                .ToListAsync();
+
+            return new EmployeeDashboardDto
+            {
+                totalReimburstment = data.Count,
+                totalAmount = data.Sum(x => x.Amount),
+                totalApprove = data.Count(x => x.Status == "Approved"),
+                totalRejected = data.Count(x => x.Status == "Rejected"),
+                totalPending = data.Count(x => x.Status == "Pending"),
+                totalPaid = data.Count(x => x.Status == "Paid")
+            };
+        }
+
         public async Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId)
         {
             var data = await _context.Reimburstments
