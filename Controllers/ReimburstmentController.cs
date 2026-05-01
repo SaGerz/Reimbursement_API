@@ -72,6 +72,30 @@ namespace Reimbursement_API.Controllers
             }
         }
 
+        [Authorize(Roles = "Employee")]
+        [HttpGet("Dashboard")]
+        public async Task<IActionResult> GetEmployeeDashboard()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return BadRequest(new {message = "UserId Not Found"});
+                }
+
+                var userId = int.Parse(userIdClaim.Value);
+
+                var result = await _reimbursementServices.GetEmployeeDashboardAsync(userId);
+
+                return Ok(result);
+            } 
+            catch(Exception ex)
+            {
+                return BadRequest(new {message = ex.Message});
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetail(int id)
         {

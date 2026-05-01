@@ -15,6 +15,7 @@ namespace Reimbursement_API.Interface
         Task<Reimburstment> CreateReimburstmentAsync(int id, CreateReimburstmentDto dto);
         Task<PaginationResponse<ReimburstmentListDto>> GetMyReimburstmentAsync(int userId, int page, int pageSize);
         Task<ReimburstmentDetailDto?> GetDetailAsync(int id, int currentUserId);
+        Task<EmployeeDashboardDto> GetEmployeeDashboardAsync(int userId); 
 
         // Manager
         Task<List<PendingReimburstmentDto>> GetPendingReimburstmentAsync();
