@@ -13,5 +13,6 @@ namespace Reimbursement_API.DTOs
         public int totalRejected {get; set;}
         public int totalPending {get; set;}
         public decimal totalPaid {get; set;}
+        public List<RecentReimburstmentDto> Recent{get; set;}
     }
 }

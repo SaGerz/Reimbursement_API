@@ -110,6 +110,7 @@ namespace Reimbursement_API.Services
         {
             var data = await _context.Reimburstments
                 .Where(r => r.EmployeeId == userId)
+                .Include(r => r.Category)
                 .ToListAsync();
 
             return new EmployeeDashboardDto
@@ -119,7 +120,19 @@ namespace Reimbursement_API.Services
                 totalApprove = data.Count(x => x.Status == "Approved"),
                 totalRejected = data.Count(x => x.Status == "Rejected"),
                 totalPending = data.Count(x => x.Status == "Pending"),
-                totalPaid = data.Where(x => x.Status == "Paid").Sum(x => x.Amount)
+                totalPaid = data.Where(x => x.Status == "Paid").Sum(x => x.Amount),
+                Recent = data
+                            .OrderByDescending(x => x.CreateAt)
+                            .Take(5)
+                            .Select(x => new RecentReimburstmentDto
+                            {
+                                ReimbursementId = x.ReimbursementId,
+                                CreateAt = x.CreateAt,
+                                CategoryName = x.Category.CategoryName,
+                                Description = x.Description,
+                                Amount = x.Amount,
+                                Status = x.Status
+                            }).ToList()
             };
         }
 
