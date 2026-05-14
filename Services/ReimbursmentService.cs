@@ -391,21 +391,29 @@ namespace Reimbursement_API.Services
             var currentMonth = now.Month;
             var currentYear = now.Year;
 
-            var paidReimburstment = _context.Reimburstments
-                .Where(
-                    r => r.Status == "Paid" &&
-                    r.PaidDate.HasValue &&
-                    r.PaidDate.Value.Month == currentMonth &&
-                    r.PaidDate.Value.Year == currentYear
+            var totalPendingPayment = await _context.Reimburstments.CountAsync(x => x.Status == "Approved");
+            
+            var totalAmountPending = await _context.Reimburstments
+                .Where(x => x.Status == "Approved")
+                .SumAsync(x => x.Amount);
+
+            var totalPaidThisMonth = await _context.Reimburstments
+                .CountAsync(x =>
+                    x.Status == "Paid" &&
+                    x.UpdateAt.Month == currentMonth &&
+                    x.UpdateAt.Year == currentYear
                 );
 
-            var totalPaid = await paidReimburstment.SumAsync(r => r.Amount);
-            var totalCount = await paidReimburstment.CountAsync();
+            var totalAmountPaid = await _context.Reimburstments
+                .Where(x => x.Status == "Paid")
+                .SumAsync(x => x.Amount);
 
             return new FinanceDashboardDto
             {
-                TotalPaidThisMonth = totalPaid,
-                TotalPaidCountThisMonth = totalCount
+               TotalPendingPayment = totalPendingPayment,
+               TotalAmountPending = totalAmountPending,
+               PaidThisMount = totalPaidThisMonth,
+               TotalPaidThisMonth = totalAmountPaid
             };
         }
 
