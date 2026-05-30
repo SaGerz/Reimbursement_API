@@ -23,6 +23,7 @@ namespace Reimbursement_API.Interface
         Task<bool> ApproveAsync(int userId, int id, string? ManagerApproveNotes);
         Task<bool> RejectAsync(int userId, int id, string ManagerRejectedNotes);
         Task<PaginationResponse<ApprovalHistoryDto>> GetApprovalHistoryAsync(int page, int pageSize);
+        Task<ManagerDashboardDto> GetManagerDashboardAsync();
 
         // Finance
         Task<FinanceDashboardDto> GetFinanceDashboardAsync();

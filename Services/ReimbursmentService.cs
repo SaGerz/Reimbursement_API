@@ -301,6 +301,42 @@ namespace Reimbursement_API.Services
             };
         }
 
+        public async Task<ManagerDashboardDto> GetManagerDashboardAsync()
+        {
+            var now = DateTime.UtcNow;
+            var currentMonth = now.Month;
+            var currentYear = now.Year;
+
+            var totalPendingThisMoth = await _context.Reimburstments
+                .CountAsync(x => x.Status == "Pending" 
+                            && x.UpdateAt.Month == currentMonth
+                            && x.UpdateAt.Year == currentYear);
+
+            var totalApproveThisMonth = await _context.Reimburstments
+                .CountAsync(x => x.Status == "Approved"
+                            && x.UpdateAt.Month == currentMonth
+                            && x.UpdateAt.Year == currentYear
+                );
+
+            var totalRejectedThisMonth = await _context.Reimburstments
+                .CountAsync(x => x.Status == "Rejected"
+                            && x.UpdateAt.Month == currentMonth
+                            && x.UpdateAt.Year == currentYear
+                );
+
+            var totalRequestThisMonth = await _context.Reimburstments
+                .CountAsync(x => x.UpdateAt.Month == currentMonth && x.UpdateAt.Year == currentYear);
+
+            return new ManagerDashboardDto
+            {
+                TotalPendingThisMonth = totalPendingThisMoth,
+                TotalApproveThisMonth = totalApproveThisMonth,
+                TotalRejectedThisMonth = totalRejectedThisMonth,
+                TotalRequestThisMonth = totalRequestThisMonth
+            };
+            
+        }
+
         public async Task<PaginationResponse<FinancePaymentQueueDto>> GetPaymentQueueAsync(int page, int pageSize)
         {
             var query = _context.Reimburstments
