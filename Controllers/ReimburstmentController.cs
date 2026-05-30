@@ -196,6 +196,14 @@ namespace Reimbursement_API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Manager")]
+        [HttpGet("manager/Dashboard")]
+        public async Task<IActionResult> GetDashboardManagerAsync()
+        {
+            var result = await _reimbursementServices.GetManagerDashboardAsync();
+            return Ok(result);
+        }
+
         [Authorize(Roles = "Finance")]
         [HttpGet("finance/payment-queue")]
         public async Task<IActionResult> GetPaymentQueueAsync([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
