@@ -14,5 +14,14 @@ namespace Reimbursement_API.Data
         public DbSet<Reimburstment> Reimburstments { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ApprovalHistory> ApprovalHistories { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().ToTable("users");
+            modelBuilder.Entity<Reimburstment>().ToTable("reimburstments");
+            modelBuilder.Entity<Category>().ToTable("categories");
+            modelBuilder.Entity<ApprovalHistory>().ToTable("approvalhistories");
+        }
     }
 }
