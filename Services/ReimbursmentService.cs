@@ -314,8 +314,8 @@ namespace Reimbursement_API.Services
 
             var totalApproveThisMonth = await _context.Reimburstments
                 .CountAsync(x => x.Status == "Approved"
-                            && x.UpdateAt.Month == currentMonth
-                            && x.UpdateAt.Year == currentYear
+                            && x.ApprovedAt.Month == currentMonth
+                            && x.ApprovedAt.Year == currentYear
                 );
 
             var totalRejectedThisMonth = await _context.Reimburstments
