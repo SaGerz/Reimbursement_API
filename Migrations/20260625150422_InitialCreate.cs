@@ -16,7 +16,7 @@ namespace Reimbursement_API.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Categories",
+                name: "categories",
                 columns: table => new
                 {
                     CategoryId = table.Column<int>(type: "int", nullable: false)
@@ -30,12 +30,12 @@ namespace Reimbursement_API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
+                    table.PrimaryKey("PK_categories", x => x.CategoryId);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "users",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
@@ -54,17 +54,17 @@ namespace Reimbursement_API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_users", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_Users_Users_ManagerId",
+                        name: "FK_users_users_ManagerId",
                         column: x => x.ManagerId,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "UserId");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Reimburstments",
+                name: "reimburstments",
                 columns: table => new
                 {
                     ReimbursementId = table.Column<int>(type: "int", nullable: false)
@@ -92,29 +92,33 @@ namespace Reimbursement_API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reimburstments", x => x.ReimbursementId);
+                    table.PrimaryKey("PK_reimburstments", x => x.ReimbursementId);
                     table.ForeignKey(
-                        name: "FK_Reimburstments_Categories_CategoryId",
+                        name: "FK_reimburstments_categories_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        principalTable: "categories",
                         principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Reimburstments_Users_EmployeeId",
+                        name: "FK_reimburstments_users_EmployeeId",
                         column: x => x.EmployeeId,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_reimburstments_users_PaidBy",
+                        column: x => x.PaidBy,
+                        principalTable: "users",
+                        principalColumn: "UserId");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ApprovalHistories",
+                name: "approvalhistories",
                 columns: table => new
                 {
                     HistoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ReimburstmentId = table.Column<int>(type: "int", nullable: false),
                     ReimbursementId = table.Column<int>(type: "int", nullable: false),
                     ActionBy = table.Column<int>(type: "int", nullable: false),
                     ActionType = table.Column<string>(type: "longtext", nullable: false)
@@ -125,45 +129,50 @@ namespace Reimbursement_API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApprovalHistories", x => x.HistoryId);
+                    table.PrimaryKey("PK_approvalhistories", x => x.HistoryId);
                     table.ForeignKey(
-                        name: "FK_ApprovalHistories_Reimburstments_ReimbursementId",
+                        name: "FK_approvalhistories_reimburstments_ReimbursementId",
                         column: x => x.ReimbursementId,
-                        principalTable: "Reimburstments",
+                        principalTable: "reimburstments",
                         principalColumn: "ReimbursementId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApprovalHistories_Users_ActionBy",
+                        name: "FK_approvalhistories_users_ActionBy",
                         column: x => x.ActionBy,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApprovalHistories_ActionBy",
-                table: "ApprovalHistories",
+                name: "IX_approvalhistories_ActionBy",
+                table: "approvalhistories",
                 column: "ActionBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApprovalHistories_ReimbursementId",
-                table: "ApprovalHistories",
+                name: "IX_approvalhistories_ReimbursementId",
+                table: "approvalhistories",
                 column: "ReimbursementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reimburstments_CategoryId",
-                table: "Reimburstments",
+                name: "IX_reimburstments_CategoryId",
+                table: "reimburstments",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reimburstments_EmployeeId",
-                table: "Reimburstments",
+                name: "IX_reimburstments_EmployeeId",
+                table: "reimburstments",
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_ManagerId",
-                table: "Users",
+                name: "IX_reimburstments_PaidBy",
+                table: "reimburstments",
+                column: "PaidBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_ManagerId",
+                table: "users",
                 column: "ManagerId");
         }
 
@@ -171,16 +180,16 @@ namespace Reimbursement_API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApprovalHistories");
+                name: "approvalhistories");
 
             migrationBuilder.DropTable(
-                name: "Reimburstments");
+                name: "reimburstments");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "categories");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "users");
         }
     }
 }

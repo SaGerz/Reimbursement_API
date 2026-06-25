@@ -12,8 +12,8 @@ using Reimbursement_API.Data;
 namespace Reimbursement_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251210150659_FixApprovalHistoryFK")]
-    partial class FixApprovalHistoryFK
+    [Migration("20260625151239_AddPaymentModule")]
+    partial class AddPaymentModule
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,43 @@ namespace Reimbursement_API.Migrations
 
                     b.HasIndex("ReimbursementId");
 
-                    b.ToTable("ApprovalHistories");
+                    b.ToTable("approvalhistories", (string)null);
+                });
+
+            modelBuilder.Entity("Reimbursement_API.Models.BankAccount", b =>
+                {
+                    b.Property<int>("BankAccountId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BankAccountId"));
+
+                    b.Property<string>("AccountHolderName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Accountnumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BankCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("BankAccountId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("bankaccounts", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.Category", b =>
@@ -81,7 +117,47 @@ namespace Reimbursement_API.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("categories", (string)null);
+                });
+
+            modelBuilder.Entity("Reimbursement_API.Models.PaymentTransaction", b =>
+                {
+                    b.Property<int>("PaymentTransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PaymentTransactionId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime?>("CompleteAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProviderRefrence")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReimburstmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("PaymentTransactionId");
+
+                    b.HasIndex("ReimburstmentId");
+
+                    b.ToTable("paymenttransactions", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.Reimburstment", b =>
@@ -145,7 +221,9 @@ namespace Reimbursement_API.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("Reimburstments");
+                    b.HasIndex("PaidBy");
+
+                    b.ToTable("reimburstments", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.User", b =>
@@ -185,7 +263,7 @@ namespace Reimbursement_API.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.ApprovalHistory", b =>
@@ -207,6 +285,28 @@ namespace Reimbursement_API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Reimbursement_API.Models.BankAccount", b =>
+                {
+                    b.HasOne("Reimbursement_API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Reimbursement_API.Models.PaymentTransaction", b =>
+                {
+                    b.HasOne("Reimbursement_API.Models.Reimburstment", "Reimburstment")
+                        .WithMany()
+                        .HasForeignKey("ReimburstmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reimburstment");
+                });
+
             modelBuilder.Entity("Reimbursement_API.Models.Reimburstment", b =>
                 {
                     b.HasOne("Reimbursement_API.Models.Category", "Category")
@@ -221,9 +321,15 @@ namespace Reimbursement_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Reimbursement_API.Models.User", "PaidByUser")
+                        .WithMany()
+                        .HasForeignKey("PaidBy");
+
                     b.Navigation("Category");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("PaidByUser");
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.User", b =>
