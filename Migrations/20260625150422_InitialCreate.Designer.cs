@@ -12,7 +12,7 @@ using Reimbursement_API.Data;
 namespace Reimbursement_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251101183856_InitialCreate")]
+    [Migration("20260625150422_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -46,9 +46,6 @@ namespace Reimbursement_API.Migrations
                     b.Property<int>("ReimbursementId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReimburstmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Remarks")
                         .HasColumnType("longtext");
 
@@ -58,7 +55,7 @@ namespace Reimbursement_API.Migrations
 
                     b.HasIndex("ReimbursementId");
 
-                    b.ToTable("ApprovalHistories");
+                    b.ToTable("approvalhistories", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.Category", b =>
@@ -84,7 +81,7 @@ namespace Reimbursement_API.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("categories", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.Reimburstment", b =>
@@ -148,7 +145,9 @@ namespace Reimbursement_API.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("Reimburstments");
+                    b.HasIndex("PaidBy");
+
+                    b.ToTable("reimburstments", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.User", b =>
@@ -188,7 +187,7 @@ namespace Reimbursement_API.Migrations
 
                     b.HasIndex("ManagerId");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.ApprovalHistory", b =>
@@ -224,9 +223,15 @@ namespace Reimbursement_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Reimbursement_API.Models.User", "PaidByUser")
+                        .WithMany()
+                        .HasForeignKey("PaidBy");
+
                     b.Navigation("Category");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("PaidByUser");
                 });
 
             modelBuilder.Entity("Reimbursement_API.Models.User", b =>
