@@ -23,7 +23,8 @@ namespace Reimbursement_API.Models
         public string AccountHolderName { get; set; }
 
         [Required]
-        public bool isActive { get; set; } = true;
+        public bool IsActive { get; set; } = true;
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
     }
 }
