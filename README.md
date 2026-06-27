@@ -27,10 +27,7 @@ This project is currently under active development.
 ---
 
 ## Planned Features (Roadmap)
-- Finance payment processing
-- Upload payment proof
-- Financial reports (monthly / per employee)
-- Dashboard summary for all roles
+- Finance payment processing (use disburstment payment method)
 
 ---
 
@@ -39,6 +36,7 @@ This project is currently under active development.
 - Entity Framework Core
 - SQL Server
 - JWT Authentication
+- Docker (For DB Container)
 
 ---
 
@@ -48,6 +46,8 @@ Main tables used in this project:
 - Reimbursements
 - Categories
 - ApprovalHistories
+- BankAccounts
+- PaymentTransactions
 
 The system uses:
 - **Snapshot state** in `Reimbursements`
