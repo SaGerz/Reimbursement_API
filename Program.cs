@@ -83,6 +83,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<AuthService>();
 // builder.Services.AddScoped<ReimbursmentService>();
 builder.Services.AddScoped<IReimbursementService, ReimbursmentService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 var app = builder.Build();
 

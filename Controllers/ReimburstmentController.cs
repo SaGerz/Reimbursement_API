@@ -18,10 +18,12 @@ namespace Reimbursement_API.Controllers
     public class ReimburstmentController : ControllerBase
     {
         private IReimbursementService _reimbursementServices;
+        private IPaymentService _paymentServices;
 
-        public ReimburstmentController(IReimbursementService reimbursementServices)
+        public ReimburstmentController(IReimbursementService reimbursementServices, IPaymentService paymentServices)
         {
             _reimbursementServices = reimbursementServices;
+            _paymentServices = paymentServices;
         }
 
         [Authorize(Roles = "Employee")]
@@ -243,6 +245,23 @@ namespace Reimbursement_API.Controllers
         {
             var data = await _reimbursementServices.GetReportByEmployeeAsync(month, year);
             return Ok(data);
+        }
+
+        [Authorize(Roles = "Finance")]
+        [HttpPost("finance/reimburstment/{id}/pay")]
+        public async Task<IActionResult> FinancePay(int id)
+        {
+            var financeIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (financeIdClaim == null)
+            {
+                return BadRequest(new { mesage = "User ID Claim not found" });
+            }
+
+            var financeId = int.Parse(financeIdClaim.Value);
+
+            var result = await _paymentServices.PayAsync(financeId, id);
+            return Ok(new { message = "Pembayaran berhasil dilakukan!" });
         }
     }
 }
