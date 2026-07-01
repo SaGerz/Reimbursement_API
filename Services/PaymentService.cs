@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Reimbursement_API.Data;
+using Reimbursement_API.DTOs;
 using Reimbursement_API.Interface;
 using Reimbursement_API.Models;
 
@@ -54,6 +55,45 @@ namespace Reimbursement_API.Services
             _context.PaymentTransactions.Add(paymentTransaction);
             await _context.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<bool> HandleWebHookAsync(PaymentWebHookDto dto)
+        {
+            var paymentCheckExist = await _context.PaymentTransactions
+                .FirstOrDefaultAsync(x => x.PaymentTransactionId == dto.PaymentTransactionId);
+
+            if(paymentCheckExist == null)
+            {
+                throw new Exception("Payment transaction belum pernah dibuat!");
+            }
+
+            if(paymentCheckExist.Status == "Success")
+            {
+                return true;
+            }
+            
+            if(dto.PaymentStatus == "Success")
+            {
+                paymentCheckExist.Status = "Success";
+                paymentCheckExist.CompleteAt = DateTime.UtcNow;
+            } else
+            {
+                throw new Exception("Payment Mock Failed");
+            }
+
+            var reimburstment = await _context.Reimburstments
+                .FirstOrDefaultAsync(x => x.ReimbursementId == paymentCheckExist.ReimburstmentId);
+            
+            if(reimburstment == null)
+            {
+                throw new Exception("Reimburstment belum terbentuk");
+            }
+
+            reimburstment.Status = "Paid";
+            reimburstment.PaidDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
             return true;
         }
     }
