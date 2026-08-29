@@ -11,7 +11,8 @@ using System.IdentityModel.Tokens.Jwt;        // JwtSecurityToken, JwtSecurityTo
 using System.Security.Claims;                // Claim, ClaimTypes
 using System.Text;                           // Encoding
 using Microsoft.IdentityModel.Tokens;
-using Reimbursement_API.Services;        // SymmetricSecurityKey, SigningCredentials, SecurityAlgorithms
+using Reimbursement_API.Services;
+using Microsoft.AspNetCore.Authorization;        // SymmetricSecurityKey, SigningCredentials, SecurityAlgorithms
 
 
 namespace Reimbursement_API.Controllers
@@ -50,12 +51,52 @@ namespace Reimbursement_API.Controllers
             try
             {
                 var response = await _authService.LoginAsync(dto);
-                return Ok(response);
+                Response.Cookies.Append("token", response.Token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = response.ExpiresAt,
+                    Path = "/"
+                });
+
+                return Ok(new
+                {
+                    role = response.Role,
+                    fullName = response.FullName
+                });
             }
             catch (Exception ex)
             {
                 return Unauthorized(new { error = ex.Message });
             }
+        }
+
+        [HttpPost("logout")]
+        public IActionResult logout()
+        {
+            Response.Cookies.Delete("token", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Strict,
+                Path = "/"
+            });
+
+            return Ok(new { message = "Logout success" });
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            var fullName = User.FindFirst(ClaimTypes.Name)?.Value;
+
+            if (role == null)
+                return Unauthorized();
+
+            return Ok(new { role, fullName });
         }
     }
 }
