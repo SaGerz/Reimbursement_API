@@ -47,7 +47,8 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         }
     );
 });
@@ -66,6 +67,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.ContainsKey("token"))
+                {
+                    Console.WriteLine("Cookie token ketemu, di-set ke context.Token");
+                    context.Token = context.Request.Cookies["token"];
+                }
+                else
+                {
+                    Console.WriteLine("Cookie token TIDAK ketemu di request");
+                }
+                return Task.CompletedTask;
+            }
+        };
+
     });
 
 // Authorization
