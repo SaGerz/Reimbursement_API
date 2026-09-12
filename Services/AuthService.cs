@@ -10,6 +10,7 @@ using Reimbursement_API.DTOs;
 using Reimbursement_API.Models;
 using System.Text;                           // Encoding
 using Microsoft.IdentityModel.Tokens;
+using Reimbursement_API.DTO;
 
 namespace Reimbursement_API.Services
 {
@@ -54,14 +55,32 @@ namespace Reimbursement_API.Services
                 throw new Exception("Invalid credentials");
 
             var token = GenerateJwtToken(user);
+            var refreshToken = await GenerateRefreshTokenAsync(user.UserId); 
 
             return new AuthResponseDto
             {
                 Token = token,
+                RefreshToken = refreshToken.Token,
                 Role = user.Role,
                 FullName = user.FullName,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpiresMinutes"]))
             };
+        }
+
+        public async Task<RefreshToken> GenerateRefreshTokenAsync(int userId)
+        {
+            var refreshToken = new RefreshToken
+            {
+                Token = Guid.NewGuid().ToString(),
+                UserId = userId,
+                ExpiresAt = DateTime.UtcNow.AddDays(double.Parse(_config["Jwt:RefreshTokenExpiresDays"])),
+                isRevoked = false
+            };
+
+            _context.RefreshTokens.Add(refreshToken);
+            await _context.SaveChangesAsync();
+
+            return refreshToken;
         }
 
         private string GenerateJwtToken(User user)
@@ -90,5 +109,26 @@ namespace Reimbursement_API.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }    
+
+        public async Task<RefreshTokensResponseDto> RefreshAccessTokenAsync(string refreshTokenValue)
+        {
+            var storedToken = await _context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == refreshTokenValue);
+
+            if(storedToken == null || storedToken.isRevoked || storedToken.ExpiresAt < DateTime.UtcNow)
+            {
+                throw new Exception("Invalid or Expired refresh token!");
+            }
+
+            var newAccessToken = GenerateJwtToken(storedToken.User);
+
+            return new RefreshTokensResponseDto
+            {
+                AccessToken = newAccessToken,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpiresMinutes"]))
+            };
+
+        }
     }
 }

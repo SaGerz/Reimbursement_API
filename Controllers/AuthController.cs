@@ -60,6 +60,15 @@ namespace Reimbursement_API.Controllers
                     Path = "/"
                 });
 
+                Response.Cookies.Append("refreshToken", response.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(double.Parse(_config["Jwt:RefreshTokenExpiresDays"])),
+                    Path = "/api/Auth"
+                });
+
                 return Ok(new
                 {
                     role = response.Role,
@@ -67,6 +76,35 @@ namespace Reimbursement_API.Controllers
                 });
             }
             catch (Exception ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Unauthorized(new { error = "No refresh token provided!" });
+            }
+
+            try
+            {
+                var result = await _authService.RefreshAccessTokenAsync(refreshToken);
+
+                Response.Cookies.Append("token", result.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = result.ExpiresAt,
+                    Path = "/"
+                });
+
+                return Ok(new { message = "Token refreshed" });
+            } catch(Exception ex)
             {
                 return Unauthorized(new { error = ex.Message });
             }

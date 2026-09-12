@@ -16,6 +16,7 @@ namespace Reimbursement_API.Data
         public DbSet<ApprovalHistory> ApprovalHistories { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +27,12 @@ namespace Reimbursement_API.Data
             modelBuilder.Entity<ApprovalHistory>().ToTable("approvalhistories");
             modelBuilder.Entity<BankAccount>().ToTable("bankaccounts");
             modelBuilder.Entity<PaymentTransaction>().ToTable("paymenttransactions");
+            modelBuilder.Entity<RefreshToken>().ToTable("refreshTokens");
+
+            // Index kolom token biar pencarian /refresh tetep gercep
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.Token)
+                .IsUnique();
         }
     }
 }
