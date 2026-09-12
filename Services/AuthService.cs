@@ -130,5 +130,15 @@ namespace Reimbursement_API.Services
             };
 
         }
+
+        public async Task RevokeRefreshTokenAsync(string tokenValue)
+        {
+            var token = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == tokenValue);
+            if (token != null)
+            {
+                token.isRevoked = true;
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

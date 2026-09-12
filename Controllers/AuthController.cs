@@ -111,14 +111,26 @@ namespace Reimbursement_API.Controllers
         }
 
         [HttpPost("logout")]
-        public IActionResult logout()
+        public async Task<IActionResult> logout()
         {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if(!string.IsNullOrEmpty(refreshToken))
+            {
+                await _authService.RevokeRefreshTokenAsync(refreshToken);
+            }
+            
             Response.Cookies.Delete("token", new CookieOptions
             {
                 HttpOnly = true,
                 Secure = false,
                 SameSite = SameSiteMode.Strict,
                 Path = "/"
+            });
+
+            Response.Cookies.Delete("refreshToken", new CookieOptions
+            {
+                Path = "/api/Auth"
             });
 
             return Ok(new { message = "Logout success" });
