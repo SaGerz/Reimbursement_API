@@ -5,14 +5,14 @@ services:
   
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYYSQL_DATABASE: reimburstment_db
+      MYSQL_DATABASE: reimbursement_db
 
     ports:
       - "3306:3306"
     
     volumes:
       - mysql_data:/var/lib/mysql
-  
+
   api:
     build: 
       context: .
