@@ -13,6 +13,15 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+    
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+
   api:
     build: 
       context: .
@@ -23,7 +32,8 @@ services:
       - "5279:8080"
     
     depends_on:
-      - mysql
+      mysql: 
+        condition: service_healthy
 
     environment:
       ASPNETCORE_URLS: http://+:8080
