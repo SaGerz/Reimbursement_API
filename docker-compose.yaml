@@ -37,7 +37,7 @@ services:
 
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_ENVIROMENT: Development
+      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: "server=mysql;port=3306;database=reimbursement_db;user=root;password=root;"
     
 
